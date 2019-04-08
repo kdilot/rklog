@@ -40,16 +40,17 @@ module.exports = function (passport) {
   }))
 
   route.get(config.linkedin.link,
-    passport.authenticate('linkedin')
+    passport.authenticate('linkedin', { state: 'SOME STATE' })
   )
 
   route.get(config.linkedin.callback, passport.authenticate('linkedin', {
     successRedirect: '/welcome',
-    failureRedirect: '/'
+    failureRedirect: '/fail'
   }))
-
-  route.get('/test2', async (ctx) => {
-    ctx.body = 'adsf123'
-  })
+  route.get('/auth/guest', (passport.authenticate('local', {
+    successRedirect: '/gguest',
+    failureRedirect: '/sdf',
+  })))
+  
   return route
 }

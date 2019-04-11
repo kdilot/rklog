@@ -25,8 +25,15 @@ module.exports = function (app) {
     }
   })
 
-  passport.use(new LocalStrategy((username, password, done) => {
-
+  passport.use(new LocalStrategy((username, password, cb) => {
+    console.log(111)
+    const user = {
+      authId: `guest`,
+      name: 'guest',
+      email: '',
+      platform: 'guest'
+    }
+    return cb(null, user)
   }))
 
   passport.use(new GoogleStrategy({
@@ -34,7 +41,7 @@ module.exports = function (app) {
     clientSecret: config.google.secret,
     callbackURL: config.google.callback
   },
-    function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, cb) {
       console.log(profile)
       const user = {
         authId: `google${profile.id}`,
@@ -51,7 +58,7 @@ module.exports = function (app) {
     clientSecret: config.kakao.secret,
     callbackURL: config.kakao.callback
   },
-    function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, cb) {
       const user = {
         authId: `kakao${profile.id}`,
         name: profile.displayName,
@@ -68,7 +75,7 @@ module.exports = function (app) {
     callbackURL: config.facebook.callback,
     profileFields: config.facebook.fields
   },
-    function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, cb) {
       const user = {
         authId: `facebook${profile.id}`,
         name: profile.displayName,
@@ -100,8 +107,16 @@ module.exports = function (app) {
     clientSecret: config.linkedin.secret,
     callbackURL: config.linkedin.callback,
     scope: config.linkedin.fields,
-    profileFields: ['email-address', 'id', 'first-name', 'last-name', 'public-profile-url'],
-    state: true
+    profileFields: [
+      "id",
+      "first-name",
+      "location",
+      "last-name",
+      "picture-url",
+      "email-address",
+      "public-profile-url",
+      "positions",
+    ],
   },
     function (accessToken, refreshToken, profile, cb) {
       process.nextTick(function () {

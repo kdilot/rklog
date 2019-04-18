@@ -51,6 +51,6 @@ module.exports = function (passport) {
     successRedirect: '/gguest',
     failureRedirect: '/sdf',
   })))
-  
+    
   return route
 }

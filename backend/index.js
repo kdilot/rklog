@@ -8,15 +8,13 @@ const serve = require('koa-static');
 // const Router = require('koa-router');
 const path = require('path');
 const app = new Koa();
+app.keys = ['super-secret-key'];  // session
 
-
+app.use(bodyParser());
+app.use(session(app));
 const passport = require('passport/index')(app);
 const auth = require('passport/auth')(passport);
 app.use(auth.routes());
-
-app.keys = ['super-secret-key'];  // session
-app.use(session(app));
-app.use(bodyParser());
 app.use(serve(path.resolve(__dirname, 'build/')));  // client page
 
 const api = require('api');

@@ -2,26 +2,45 @@
 
 // Social.js
 .social {
-  margin: 0.3em;
+  margin-bottom: 5px;
 }
 .social-cover {
+  height: 50px;
   display: flex;
   align-items: center;
   text-align: center;
-  .image { display: contents; }
+  border-radius: 1em;
   .text {
     color: white;
     width: 100%;
-    font-size: 1.5em;
+    font-size: 1.7em;
     font-weight: bold;
     text-transform: capitalize;
   }
 }
-.naver { background: $naver; }
-.facebook { background: $facebook; }
-.google { background: $google; }
-.kakao { background: $kakao; }
-.linkedin { background: $linkedin; }
-.guest { 
+.social-cover:hover {
+  background: white;
+  border: 2px solid black;
+  .text {
+    color: black;
+  }
+}
+.naver {
+  background: $naver;
+}
+.facebook {
+  background: $facebook;
+}
+.google {
+  background: $google;
+}
+.kakao {
+  background: $kakao;
+}
+.linkedin {
+  background: $linkedin;
+}
+.guest {
   background: black;
- }
+  margin-top: 1em;
+}

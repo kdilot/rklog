@@ -8,8 +8,8 @@ module.exports = function (passport) {
   )
 
   route.get(config.google.callback, passport.authenticate('google', {
-    successRedirect: '/welcome',
-    failureRedirect: '/'
+    successRedirect: config.callbackURL.suc,
+    failureRedirect: config.callbackURL.fail
   }))
 
   route.get(config.kakao.link,
@@ -17,8 +17,8 @@ module.exports = function (passport) {
   )
 
   route.get(config.kakao.callback, passport.authenticate('kakao', {
-    successRedirect: '/welcome',
-    failureRedirect: '/'
+    successRedirect: config.callbackURL.suc,
+    failureRedirect: config.callbackURL.fail
   }))
 
   route.get(config.facebook.link,
@@ -26,8 +26,8 @@ module.exports = function (passport) {
   )
 
   route.get(config.facebook.callback, passport.authenticate('facebook', {
-    successRedirect: '/welcome',
-    failureRedirect: '/'
+    successRedirect: config.callbackURL.suc,
+    failureRedirect: config.callbackURL.fail
   }))
 
   route.get(config.naver.link,
@@ -35,22 +35,20 @@ module.exports = function (passport) {
   )
 
   route.get(config.naver.callback, passport.authenticate('naver', {
-    successRedirect: '/welcome',
-    failureRedirect: '/'
+    successRedirect: config.callbackURL.suc,
+    failureRedirect: config.callbackURL.fail
   }))
 
+  /*
   route.get(config.linkedin.link,
     passport.authenticate('linkedin', { state: 'SOME STATE' })
   )
 
   route.get(config.linkedin.callback, passport.authenticate('linkedin', {
-    successRedirect: '/welcome',
+    successRedirect: config.callbackURL.suc,
     failureRedirect: '/fail'
   }))
-  route.get('/auth/guest', (passport.authenticate('local', {
-    successRedirect: '/gguest',
-    failureRedirect: '/sdf',
-  })))
-    
+  */
+  
   return route
 }

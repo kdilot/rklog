@@ -6,11 +6,11 @@ const MemberSchema = new Schema({
   displayName: String,
   email: String,
   platform: String,
-  signUpDate: Date,
+  signUpDate: { type: Date, default: new Date() },
   signOutDate: Date,
-  lastLoginDate: Date,
-  level: Number,
-  display: Boolean,
+  lastLoginDate: { type: Date, default: new Date() },
+  level: { type: Number, default: 0 },
+  display: { type: Boolean, default: true },
 })
 
 MemberSchema.statics.drop = function () {
@@ -18,7 +18,7 @@ MemberSchema.statics.drop = function () {
 }
 
 MemberSchema.statics.checkUserData = function (authId) {
-  return this.findOne({ authId }).exec()
+  return this.findOneAndUpdate({ authId, display: true }, { lastLoginDate: new Date() }).exec()
 }
 
 MemberSchema.statics.checkNameData = function (displayName) {

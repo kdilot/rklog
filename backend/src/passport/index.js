@@ -8,40 +8,37 @@ module.exports = function (app) {
   const LinkedinStrategy = require('passport-linkedin-oauth2').Strategy;
   const config = require('passport/config');
 
+  const Member = require('db/model/Member');
+
   app.use(passport.initialize());
   app.use(passport.session());
 
-  passport.serializeUser((user, done) => {
-    console.log(user)
-    done(null, user)
+  passport.serializeUser(async (user, done) => {
+    try {
+      await done(null, user.authId)
+    } catch (err) {
+      done(null, false, { message: err })
+    }
   })
 
   passport.deserializeUser(async (authId, done) => {
     try {
-      // const user = await fetchUser()
-      done(null, 'TEST')
+      await Member.checkUserData(authId).then(result => {
+        console.log(result, 'des try')
+        if (result) done(null, authId)
+        else done(null, false, { message: 'DB error' })
+      })
     } catch (err) {
-      done(err)
+      done(null, false, { message: err })
     }
   })
-
-  passport.use(new LocalStrategy((username, password, cb) => {
-    console.log(111)
-    const user = {
-      authId: `guest`,
-      name: 'guest',
-      email: '',
-      platform: 'guest'
-    }
-    return cb(null, user)
-  }))
 
   passport.use(new GoogleStrategy({
     clientID: config.google.id,
     clientSecret: config.google.secret,
     callbackURL: config.google.callback
   },
-    async function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, done) {
       console.log(profile)
       const user = {
         authId: `google${profile.id}`,
@@ -49,7 +46,7 @@ module.exports = function (app) {
         email: Array.isArray(profile.emails) ? profile.emails[0].value : null,
         platform: 'google'
       }
-      return cb(null, user)
+      return done(null, user)
     }
   ))
 
@@ -58,14 +55,14 @@ module.exports = function (app) {
     clientSecret: config.kakao.secret,
     callbackURL: config.kakao.callback
   },
-    async function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, done) {
       const user = {
         authId: `kakao${profile.id}`,
         name: profile.displayName,
         email: Array.isArray(profile.emails) ? profile.emails[0].value : null,
         platform: 'kakao'
       }
-      return cb(null, user)
+      return done(null, user)
     }
   ))
 
@@ -75,14 +72,14 @@ module.exports = function (app) {
     callbackURL: config.facebook.callback,
     profileFields: config.facebook.fields
   },
-    async function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, done) {
       const user = {
         authId: `facebook${profile.id}`,
         name: profile.displayName,
         email: Array.isArray(profile.emails) ? profile.emails[0].value : null,
         platform: 'facebook'
       }
-      return cb(null, user)
+      return done(null, user)
     }
   ))
 
@@ -91,14 +88,29 @@ module.exports = function (app) {
     clientSecret: config.naver.secret,
     callbackURL: config.naver.callback
   },
-    async function (accessToken, refreshToken, profile, cb) {
+    async function (accessToken, refreshToken, profile, done) {
       const user = {
         authId: `naver${profile.id}`,
-        name: profile.displayName,
+        displayName: profile.displayName,
         email: Array.isArray(profile.emails) ? profile.emails[0].value : null,
-        platform: 'naver'
+        platform: 'naver',
       }
-      return cb(null, user)
+      
+      try {
+        await Member.checkUserData(user.authId).then(result => {
+          if (result) {
+            done(null, result)
+          } else {
+            new Member(user).save((err, result) => {
+              if (err) done(null, false, { message: 'DB error' })
+              else if (!result) done(null, false, { message: 'DB error' })
+              else done(null, user)
+            })
+          }
+        })
+      } catch (err) {
+        done(null, false, { message: err })
+      }
     }
   ))
 
@@ -118,13 +130,13 @@ module.exports = function (app) {
       "positions",
     ],
   },
-    function (accessToken, refreshToken, profile, cb) {
+    function (accessToken, refreshToken, profile, done) {
       process.nextTick(function () {
         // To keep the example simple, the user's LinkedIn profile is returned to
         // represent the logged-in user. In a typical application, you would want
         // to associate the LinkedIn account with a user record in your database,
         // and return that user instead.
-        return cb(null, profile)
+        return done(null, profile)
       });
     }
   ))

@@ -8,13 +8,17 @@ const serve = require('koa-static');
 // const Router = require('koa-router');
 const path = require('path');
 const app = new Koa();
-app.keys = ['super-secret-key'];  // session
+const db = require('db');
 
-app.use(bodyParser());
+app.use(bodyParser());  // body parser
+
+app.keys = ['super-secret-key'];  // session
 app.use(session(app));
-const passport = require('passport/index')(app);
+
+const passport = require('passport/index')(app);  // passport
 const auth = require('passport/auth')(passport);
 app.use(auth.routes());
+
 app.use(serve(path.resolve(__dirname, 'build/')));  // client page
 
 const api = require('api');
@@ -22,6 +26,8 @@ const api = require('api');
 // app.use('/api', userAuth());
 // router.use('/api', api.routes())
 app.use(api.routes());
+
+db.connect();
 
 app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);

@@ -15,6 +15,7 @@ module.exports = function (app) {
 
   passport.serializeUser(async (user, done) => {
     try {
+      console.log('[SE]', user.authId)
       await done(null, user.authId)
     } catch (err) {
       done(null, false, { message: err })
@@ -24,7 +25,7 @@ module.exports = function (app) {
   passport.deserializeUser(async (authId, done) => {
     try {
       await Member.checkUserData(authId).then(result => {
-        console.log(result, 'des try')
+        console.log('[DSE]', authId, result._id)
         if (result) done(null, authId)
         else done(null, false, { message: 'DB error' })
       })
@@ -95,22 +96,7 @@ module.exports = function (app) {
         email: Array.isArray(profile.emails) ? profile.emails[0].value : null,
         platform: 'naver',
       }
-      
-      try {
-        await Member.checkUserData(user.authId).then(result => {
-          if (result) {
-            done(null, result)
-          } else {
-            new Member(user).save((err, result) => {
-              if (err) done(null, false, { message: 'DB error' })
-              else if (!result) done(null, false, { message: 'DB error' })
-              else done(null, user)
-            })
-          }
-        })
-      } catch (err) {
-        done(null, false, { message: err })
-      }
+      await userCheck(user, done)
     }
   ))
 
@@ -140,6 +126,24 @@ module.exports = function (app) {
       });
     }
   ))
+
+  const userCheck = (user, done) => {
+    try {
+      Member.checkUserData(user.authId).then(result => {
+        if (result) {
+          done(null, result)
+        } else {
+          new Member(user).save((err, result) => {
+            if (err) done(null, false, { message: 'DB error' })
+            else if (!result) done(null, false, { message: 'DB error' })
+            else done(null, user)
+          })
+        }
+      })
+    } catch (err) {
+      done(null, false, { message: err })
+    }
+  }
 
   return passport
 }

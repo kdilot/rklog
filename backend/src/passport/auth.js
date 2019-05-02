@@ -49,6 +49,11 @@ module.exports = function (passport) {
     failureRedirect: '/fail'
   }))
   */
+  route.get('/logout', async (ctx) => {
+    ctx.logout()
+    ctx.body = 'adsf123'
+    ctx.redirect('/')
+  })
   
   return route
 }

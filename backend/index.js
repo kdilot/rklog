@@ -10,6 +10,7 @@ const path = require('path');
 const app = new Koa();
 const db = require('db');
 
+app.use(serve(path.resolve(__dirname, 'build/')));  // client page
 app.use(bodyParser());  // body parser
 
 app.keys = ['super-secret-key'];  // session
@@ -19,7 +20,6 @@ const passport = require('passport/index')(app);  // passport
 const auth = require('passport/auth')(passport);
 app.use(auth.routes());
 
-app.use(serve(path.resolve(__dirname, 'build/')));  // client page
 
 const api = require('api');
 // app.use('/api', api);

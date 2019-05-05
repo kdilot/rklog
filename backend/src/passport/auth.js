@@ -49,11 +49,17 @@ module.exports = function (passport) {
     failureRedirect: '/fail'
   }))
   */
+
+  route.get('/test/:social', async (ctx, next) => {
+    console.log(ctx.params.social)
+    // ctx.body = `passport ${ctx.params.social}`
+    passport.authenticate('naver')
+  })
+
   route.get('/logout', async (ctx) => {
     ctx.logout()
-    ctx.body = 'adsf123'
     ctx.redirect('/')
   })
-  
+
   return route
 }
